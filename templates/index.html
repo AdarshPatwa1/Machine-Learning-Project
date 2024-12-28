@@ -4,32 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Prediction</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        transition: background 0.5s ease;
+        background-image: url('rain3.jpg');
+    }
+    h1 {
+        margin-top: 20px;
+        font-size: 3rem;
+        color: rgb(97, 220, 220);
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8), /* Dark black shadow */
+                     4px 4px 10px rgba(0, 0, 0, 0.6); /* Secondary softer black shadow */
+        font-family: cursive;
+    }
+
+    form {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 30px;
+        border: 1.5px solid aqua;
+        border-radius: 15px;
+        box-shadow: 0px 0px 30px 10px rgb(255, 255, 255);
+        display: inline-block;
+        margin-top: 20px;
+        width: 90%;
+        max-width: 400px;
+        /* transition: transform 0.3s ease; */
+    }
+    form:hover{
+        
+        box-shadow: 0px 0px 30px 15px rgb(255, 255, 255);
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        font-size: 1.2rem;
+        color: #000000;
+        font-weight: bold;
+    }
+    input {
+        padding: 12px;
+        width: 90%;
+        margin-top: 5px;
+        border: 2px solid #6d6d6d;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
+        border-radius: 8px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.65);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    input:hover {
+        border: 2px solid #ffffff;
+        box-shadow: 5px 5px 10px rgb(255, 255, 255);
+    }
+    input:focus {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
+        outline: none;
+        border-color: #3498db;
+    }
+    input::placeholder {
+        color: #95a5a6;
+        font-style: italic;
+    }
+    button {
+        margin-top: 20px;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        color: aqua; /* Black text */
+        background-color: transparent; /* Transparent background */
+        border: 2px solid aqua; /* Dark green border */
+        box-shadow: 0 0 15px 5px rgba(0, 225, 225, 0.5);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+        border: 2px solid #008200;
+        background-color: #008200; /* Leaf green background on hover */
+        color: white; /* White text on hover */
+        box-shadow: 0 0 15px 5px #b1ff5d; /* Light green shadow */
+        transform: scale(1.1);
+        transition-duration: 0.5s;
+    }
+
+    #result {
+        margin-top: 20px;
+        font-size: 1.8rem;
+        color: #e74c3c;
+        font-weight: bold;
+
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9), /* Dark black shadow */
+                     4px 4px 10px rgba(0, 0, 0, 0.9); /* Secondary softer black shadow */
+        font-family: cursive;
+    }
+
+    /* Popup style */
+    #popup {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 20px;
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
+        font-size: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    </style>
 </head>
 <body>
-<div id="div">
     <h1>Weather Prediction</h1>
     <form id="predictionForm">
         <label for="temperature">Temperature:</label>
-        <input type="number" id="temperature" name="temperature" required><br>
+        <input type="number" id="temperature" name="temperature" placeholder="Enter temperature" required><br>
 
         <label for="humidity">Humidity:</label>
-        <input type="number" id="humidity" name="humidity" required><br>
+        <input type="number" id="humidity" name="humidity" placeholder="Enter humidity" required><br>
 
         <label for="wind_speed">Wind Speed:</label>
-        <input type="number" id="wind_speed" name="wind_speed" required><br>
+        <input type="number" id="wind_speed" name="wind_speed" placeholder="Enter wind speed" required><br>
 
         <label for="cloud_cover">Cloud Cover:</label>
-        <input type="number" id="cloud_cover" name="cloud_cover" required><br>
+        <input type="number" id="cloud_cover" name="cloud_cover" placeholder="Enter cloud cover" required><br>
 
         <label for="pressure">Pressure:</label>
-        <input type="number" id="pressure" name="pressure" required><br>
+        <input type="number" id="pressure" name="pressure" placeholder="Enter pressure" required><br>
 
         <button type="submit">Predict</button>
     </form>
 
     <h2 id="result"></h2>
-</div>
+
+    <!-- Popup for prediction -->
+    <div id="popup"></div>
+
+    <!-- Audio element for rain and thunder sound -->
+    <audio id="rainSound" src="thunder.mp3" preload="auto"></audio>
+
     <script>
         document.getElementById('predictionForm').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -41,30 +163,60 @@
                 parseFloat(document.getElementById('cloud_cover').value),
                 parseFloat(document.getElementById('pressure').value)
             ];
-        try {
-            const response = await fetch('http://127.0.0.1:5000/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ features })
-            });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-    
-            const data = await response.json();
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ features })
+                });
 
-            if (data.prediction) {
-                document.getElementById('result').innerText = `Prediction: ${data.prediction}`;
-            } else {
-                document.getElementById('result').innerText = `Error: ${data.error}`;
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.prediction) {
+                    document.getElementById('result').innerText = `Prediction: ${data.prediction}`;
+
+                    // Change background, h1 color, and play sound based on prediction
+                    const rainSound = document.getElementById('rainSound');
+                    if (data.prediction.toLowerCase() === "rain") {
+                        document.body.style.backgroundImage = "url('rain1.jpg')";
+                        document.querySelector('h1').style.color = "orange";
+                        document.querySelector('h2').style.color = "orange";
+                        rainSound.play(); // Play the rain sound
+                    } else {
+                        document.body.style.backgroundImage = "url('sukha.jpg')";
+                        document.querySelector('h1').style.color = "khaki";
+                        document.querySelector('h2').style.color = "khaki";
+                        rainSound.pause(); // Stop the rain sound
+                        rainSound.currentTime = 0; // Reset the audio
+                    }
+
+                    // Show the popup
+                    const popup = document.getElementById('popup');
+                    popup.innerText = `Prediction: ${data.prediction}`;
+                    popup.style.display = 'block';
+                    popup.style.opacity = '1';
+
+                    // Hide the popup after 1 second
+                    setTimeout(() => {
+                        popup.style.opacity = '0';
+                        setTimeout(() => {
+                            popup.style.display = 'none';
+                        }, 500);
+                    }, 1000);
+                } else {
+                    document.getElementById('result').innerText = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = `Error: ${error.message}`;
             }
-        }catch (error) {
-               document.getElementById('result').innerText = `Error: ${error.message}`;
-        }
-    });
+        });
     </script>
 </body>
 </html>
