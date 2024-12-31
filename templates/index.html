@@ -151,6 +151,7 @@
 
     <!-- Audio element for rain and thunder sound -->
     <audio id="rainSound" src="thunder.mp3" preload="auto"></audio>
+    <audio id="sukha" src="sukha.mp3" preload="auto"></audio>
 
     <script>
         document.getElementById('predictionForm').addEventListener('submit', async (event) => {
@@ -184,15 +185,20 @@
 
                     // Change background, h1 color, and play sound based on prediction
                     const rainSound = document.getElementById('rainSound');
+                    const sukha = document.getElementById('sukha');
                     if (data.prediction.toLowerCase() === "rain") {
                         document.body.style.backgroundImage = "url('rain1.jpg')";
                         document.querySelector('h1').style.color = "orange";
                         document.querySelector('h2').style.color = "orange";
                         rainSound.play(); // Play the rain sound
+                        sukha.pause();
+                        sukha.currentTime=0;
+
                     } else {
                         document.body.style.backgroundImage = "url('sukha.jpg')";
                         document.querySelector('h1').style.color = "khaki";
                         document.querySelector('h2').style.color = "khaki";
+                        sukha.play();
                         rainSound.pause(); // Stop the rain sound
                         rainSound.currentTime = 0; // Reset the audio
                     }
