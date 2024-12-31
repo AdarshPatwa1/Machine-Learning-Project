@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 import joblib
 
 # Load your dataset
-data = pd.read_csv(r"C:\Users\LENOVO\Desktop\weather_forecast_data.csv")  # Replace with your dataset filename
+data = pd.read_csv("weather_forecast_data.csv")  # Replace with your dataset filename
 
 # Ensure the dataset has a "target" column
 # Replace 'Rain' with your actual target column name if different
